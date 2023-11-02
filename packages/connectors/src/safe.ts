@@ -42,6 +42,7 @@ export function safe(parameters: SafeParameters = {}) {
   return createConnector<Provider, Properties, StorageItem>((config) => ({
     id: 'safe',
     name: 'Safe',
+    isPriorityProvider: true,
     async connect() {
       const provider = await this.getProvider()
       if (!provider) throw new ProviderNotFoundError()

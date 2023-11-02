@@ -34,6 +34,7 @@ export type CreateConnectorFn<
     readonly icon?: string | undefined
     readonly id: string
     readonly name: string
+      readonly isPriorityProvider?: boolean | undefined
 
     setup?(): Promise<void>
     connect(

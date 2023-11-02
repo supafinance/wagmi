@@ -10,6 +10,7 @@ import {
   type ClientConfig as viem_ClientConfig,
   type Transport,
   createClient,
+  custom
 } from 'viem'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import { type Mutate, type StoreApi, createStore } from 'zustand/vanilla'
@@ -24,6 +25,8 @@ import { type Storage, createStorage, noopStorage } from './createStorage.js'
 import { ChainNotConfiguredError } from './errors/config.js'
 import type { Evaluate, ExactPartial, LooseOmit, OneOf } from './types/utils.js'
 import { uid } from './utils/uid.js'
+
+type EthereumProvider = { request(...args: any): Promise<any> }
 
 export type CreateConfigParameters<
   chains extends readonly [Chain, ...Chain[]] = readonly [Chain, ...Chain[]],
@@ -134,6 +137,27 @@ export function createConfig<
     {
       const client = clients.get(chainId)
       if (client) return client as Return
+    }
+
+    const connectorState = connectors.getState()
+    if (Array.isArray(connectorState)) {
+      for (const connector of connectorState) {
+        if (connector.uid !== store.getState().current) continue
+
+        if (connector.isPriorityProvider) { // todo
+          return createClient({
+            ...connector,
+            chain,
+            batch: { multicall: true },
+            transport: custom({
+              async request({ method, params }) {
+                const provider = await connector.getProvider() as EthereumProvider
+                return provider.request({method, params})
+              }
+            }),
+          }) as Client<Transport, Extract<chains[number], { id: chainId }>>
+        }
+      }
     }
 
     let client
