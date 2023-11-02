@@ -145,7 +145,6 @@ export function createConfig<
         if (connector.uid !== store.getState().current) continue
 
         if (connector.isPriorityProvider) {
-          // todo
           return createClient({
             ...connector,
             chain,
