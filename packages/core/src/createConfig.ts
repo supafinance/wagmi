@@ -10,7 +10,7 @@ import {
   type ClientConfig as viem_ClientConfig,
   type Transport,
   createClient,
-  custom
+  custom,
 } from 'viem'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import { type Mutate, type StoreApi, createStore } from 'zustand/vanilla'
@@ -144,16 +144,18 @@ export function createConfig<
       for (const connector of connectorState) {
         if (connector.uid !== store.getState().current) continue
 
-        if (connector.isPriorityProvider) { // todo
+        if (connector.isPriorityProvider) {
+          // todo
           return createClient({
             ...connector,
             chain,
             batch: { multicall: true },
             transport: custom({
               async request({ method, params }) {
-                const provider = await connector.getProvider() as EthereumProvider
-                return provider.request({method, params})
-              }
+                const provider =
+                  (await connector.getProvider()) as EthereumProvider
+                return provider.request({ method, params })
+              },
             }),
           }) as Client<Transport, Extract<chains[number], { id: chainId }>>
         }
