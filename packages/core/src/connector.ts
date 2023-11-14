@@ -1,13 +1,13 @@
 import {
+  type Chain,
   type Transport,
   type TransportConfig,
   createTransport,
-  type Chain,
 } from 'viem'
 
 import {
-  type CreateConnectorFn,
   type ConnectorEventMap,
+  type CreateConnectorFn,
 } from './connectors/createConnector.js'
 import { Emitter } from './createEmitter.js'
 
@@ -38,7 +38,7 @@ type Connector = {
 
 export function experimental_connector(
   createConnectorFns: CreateConnectorFn[],
-  config: ConnectorTransportConfig = {},
+  config: ConnectorTransportConfig,
   connectorConfig: {
     chains: readonly [Chain, ...Chain[]]
     emitter: Emitter<ConnectorEventMap>
